@@ -1,0 +1,112 @@
+{
+  "type": "App",
+  "id": "root",
+  "create": "const root = create(\"App\");\n\nsetProps(root, {});",
+  "mount": "mount(root, render);",
+  "unmount": "destroy(root);",
+  "children": [
+    {
+      "type": "h1",
+      "id": "_1",
+      "children": [
+        {
+          "type": "Text",
+          "id": "_2",
+          "value": "Test if the component is working",
+          "create": "const _2 = createText(\"Test if the component is working\");\n\nconst _2_dependencies = [null];",
+          "mount": "mount(_2, _1);",
+          "unmount": "destroy(_2);"
+        }
+      ],
+      "create": "const _1 = create(\"h1\");",
+      "mount": "mount(_1, root);\n\nmount(_2, _1);",
+      "unmount": "destroy(_1);\n\ndestroy(_2);"
+    },
+    {
+      "type": "button",
+      "id": "_3",
+      "children": [
+        {
+          "type": "Text",
+          "id": "_4",
+          "value": "Click me to see if the component is working correctly",
+          "create": "const _4 = createText(\"Click me to see if the component is working correctly\");\n\nconst _4_dependencies = [null];",
+          "mount": "mount(_4, _3);",
+          "unmount": "destroy(_4);"
+        }
+      ],
+      "create": "const _3 = create(\"button\");",
+      "mount": "mount(_3, root);\n\nmount(_4, _3);",
+      "unmount": "destroy(_3);\n\ndestroy(_4);"
+    },
+    {
+      "type": "pre",
+      "id": "_5",
+      "children": [
+        {
+          "type": "Text",
+          "id": "_6",
+          "value": "Clicked {{ \"0\"+20+1 }} times",
+          "create": "const _6 = createText('Clicked {{ \"0\"+20+1 }} times');\n\nconst _6_dependencies = [null];",
+          "mount": "mount(_6, _5);",
+          "unmount": "destroy(_6);"
+        }
+      ],
+      "create": "const _5 = create(\"pre\");",
+      "mount": "mount(_5, root);\n\nmount(_6, _5);",
+      "unmount": "destroy(_5);\n\ndestroy(_6);"
+    },
+    {
+      "type": "div",
+      "id": "_7",
+      "children": [
+        {
+          "type": "p",
+          "id": "_8",
+          "children": [
+            {
+              "type": "Text",
+              "id": "_9",
+              "value": "{{ state.count }}",
+              "create": "const _9 = createText(\"{{ state.count }}\");\n\nconst _9_dependencies = [state.count];",
+              "mount": "mount(_9, _8);",
+              "unmount": "destroy(_9);"
+            }
+          ],
+          "create": "const _8 = create(\"p\");",
+          "mount": "mount(_8, _7);\n\nmount(_9, _8);",
+          "unmount": "destroy(_8);\n\ndestroy(_9);"
+        },
+        {
+          "type": "b",
+          "id": "_a",
+          "children": [
+            {
+              "type": "p",
+              "id": "_b",
+              "children": [
+                {
+                  "type": "Text",
+                  "id": "_c",
+                  "value": "😃",
+                  "create": "const _c = createText(\"😃\");\n\nconst _c_dependencies = [null];",
+                  "mount": "mount(_c, _b);",
+                  "unmount": "destroy(_c);"
+                }
+              ],
+              "create": "const _b = create(\"p\");",
+              "mount": "mount(_b, _a);\n\nmount(_c, _b);",
+              "unmount": "destroy(_b);\n\ndestroy(_c);"
+            }
+          ],
+          "create": "const _a = create(\"b\");",
+          "mount": "mount(_a, _7);\n\nmount(_b, _a);\n\nmount(_c, _b);",
+          "unmount": "destroy(_a);\n\ndestroy(_b);\n\ndestroy(_c);"
+        }
+      ],
+      "create": "const _7 = create(\"div\");",
+      "mount": "mount(_7, root);\n\nmount(_8, _7);\n\nmount(_9, _8);\nmount(_a, _7);\n\nmount(_b, _a);\n\nmount(_c, _b);",
+      "unmount": "destroy(_7);\n\ndestroy(_8);\n\ndestroy(_9);\ndestroy(_a);\n\ndestroy(_b);\n\ndestroy(_c);"
+    }
+  ]
+}
