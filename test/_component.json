@@ -1,7 +1,8 @@
 {
   "type": "App",
   "id": "root",
-  "create": "const root = create(\"App\");\n\nsetProps(root, {});",
+  "isFor": false,
+  "create": "root = create(\"App\");",
   "mount": "mount(root, render);",
   "unmount": "destroy(root);",
   "children": [
@@ -12,101 +13,72 @@
         {
           "type": "Text",
           "id": "_2",
+          "isFor": true,
           "value": "Test if the component is working",
-          "create": "const _2 = createText(\"Test if the component is working\");\n\nconst _2_dependencies = [null];",
+          "create": "_2_val = () => `Test if the component is working`;\n\n_2 = createText(_2_val());\n\n_2_update = () => {\n  _2.textContent = _2_val();\n};",
           "mount": "mount(_2, _1);",
-          "unmount": "destroy(_2);"
+          "unmount": "destroy(_2);",
+          "update": "_2_update();"
         }
       ],
-      "create": "const _1 = create(\"h1\");",
+      "isFor": true,
+      "create": "_1 = create(\"h1\");\n\n_1_props = () => {\n  setProps(_1, {});\n};\n\n_1_props();\n\nsetEvents(\n  _1,\n\n  {}\n);\n\n_1_update_props = _1_props;",
       "mount": "mount(_1, root);\n\nmount(_2, _1);",
-      "unmount": "destroy(_1);\n\ndestroy(_2);"
-    },
-    {
-      "type": "button",
-      "id": "_3",
-      "children": [
-        {
-          "type": "Text",
-          "id": "_4",
-          "value": "Click me to see if the component is working correctly",
-          "create": "const _4 = createText(\"Click me to see if the component is working correctly\");\n\nconst _4_dependencies = [null];",
-          "mount": "mount(_4, _3);",
-          "unmount": "destroy(_4);"
-        }
-      ],
-      "create": "const _3 = create(\"button\");",
-      "mount": "mount(_3, root);\n\nmount(_4, _3);",
-      "unmount": "destroy(_3);\n\ndestroy(_4);"
-    },
-    {
-      "type": "pre",
-      "id": "_5",
-      "children": [
-        {
-          "type": "Text",
-          "id": "_6",
-          "value": "Clicked {{ \"0\"+20+1 }} times",
-          "create": "const _6 = createText('Clicked {{ \"0\"+20+1 }} times');\n\nconst _6_dependencies = [null];",
-          "mount": "mount(_6, _5);",
-          "unmount": "destroy(_6);"
-        }
-      ],
-      "create": "const _5 = create(\"pre\");",
-      "mount": "mount(_5, root);\n\nmount(_6, _5);",
-      "unmount": "destroy(_5);\n\ndestroy(_6);"
+      "unmount": "destroy(_1);\n\ndestroy(_2);",
+      "update": "_2_update();"
     },
     {
       "type": "div",
-      "id": "_7",
+      "id": "_3",
       "children": [
         {
           "type": "p",
-          "id": "_8",
+          "id": "_4",
           "children": [
             {
               "type": "Text",
-              "id": "_9",
-              "value": "{{ state.count }}",
-              "create": "const _9 = createText(\"{{ state.count }}\");\n\nconst _9_dependencies = [state.count];",
-              "mount": "mount(_9, _8);",
-              "unmount": "destroy(_9);"
+              "id": "_5",
+              "isFor": true,
+              "value": "ITEM {{ $item }}",
+              "create": "_5_val = () => `ITEM ` + $item + ``;\n\n_5 = createText(_5_val());\n\n_5_update = () => {\n  _5.textContent = _5_val();\n};",
+              "mount": "mount(_5, _4);",
+              "unmount": "destroy(_5);",
+              "update": "_5_update();"
             }
           ],
-          "create": "const _8 = create(\"p\");",
-          "mount": "mount(_8, _7);\n\nmount(_9, _8);",
-          "unmount": "destroy(_8);\n\ndestroy(_9);"
-        },
-        {
-          "type": "b",
-          "id": "_a",
-          "children": [
-            {
-              "type": "p",
-              "id": "_b",
-              "children": [
-                {
-                  "type": "Text",
-                  "id": "_c",
-                  "value": "😃",
-                  "create": "const _c = createText(\"😃\");\n\nconst _c_dependencies = [null];",
-                  "mount": "mount(_c, _b);",
-                  "unmount": "destroy(_c);"
-                }
-              ],
-              "create": "const _b = create(\"p\");",
-              "mount": "mount(_b, _a);\n\nmount(_c, _b);",
-              "unmount": "destroy(_b);\n\ndestroy(_c);"
-            }
-          ],
-          "create": "const _a = create(\"b\");",
-          "mount": "mount(_a, _7);\n\nmount(_b, _a);\n\nmount(_c, _b);",
-          "unmount": "destroy(_a);\n\ndestroy(_b);\n\ndestroy(_c);"
+          "isFor": true,
+          "create": "_4 = create(\"p\");\n\n_4_props = () => {\n  setProps(_4, {});\n};\n\n_4_props();\n\nsetEvents(\n  _4,\n\n  {}\n);\n\n_4_update_props = _4_props;",
+          "mount": "mount(_4, _3);\n\nmount(_5, _4);",
+          "unmount": "destroy(_4);\n\ndestroy(_5);",
+          "update": "_5_update();"
         }
       ],
-      "create": "const _7 = create(\"div\");",
-      "mount": "mount(_7, root);\n\nmount(_8, _7);\n\nmount(_9, _8);\nmount(_a, _7);\n\nmount(_b, _a);\n\nmount(_c, _b);",
-      "unmount": "destroy(_7);\n\ndestroy(_8);\n\ndestroy(_9);\ndestroy(_a);\n\ndestroy(_b);\n\ndestroy(_c);"
+      "isFor": true,
+      "create": "function block__3_create($item) {}",
+      "mount": "block__3_create();",
+      "unmount": "",
+      "update": ""
+    },
+    {
+      "type": "style",
+      "id": "_6",
+      "children": [
+        {
+          "type": "Text",
+          "id": "_7",
+          "isFor": true,
+          "value": "body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}",
+          "create": "_7_val = () =>\n  `body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}`;\n\n_7 = createText(_7_val());\n\n_7_update = () => {\n  _7.textContent = _7_val();\n};",
+          "mount": "mount(_7, _6);",
+          "unmount": "destroy(_7);",
+          "update": "_7_update();"
+        }
+      ],
+      "isFor": true,
+      "create": "_6 = create(\"style\");\n\n_6_props = () => {\n  setProps(_6, {});\n};\n\n_6_props();\n\nsetEvents(\n  _6,\n\n  {}\n);\n\n_6_update_props = _6_props;",
+      "mount": "mount(_6, root);\n\nmount(_7, _6);",
+      "unmount": "destroy(_6);\n\ndestroy(_7);",
+      "update": "_7_update();"
     }
   ]
 }

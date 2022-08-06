@@ -2,6 +2,9 @@ import fs from "fs";
 import * as parse5 from "parse5";
 import { config } from "../config.js";
 import { format } from "prettier";
+import { templateParser } from "./template.js";
+import { findDec, findUses } from "./declarations.js";
+import CleanCSS from "clean-css";
 
 /***/
 const _code = fs.readFileSync(config.TEST_DIR + "/component.html", "utf8");
@@ -15,7 +18,6 @@ const nanoID = () => "_" + (++id).toString(36);
 /** */
 
 function transform(_code) {
-	let out = "";
 	let node = parse5.parseFragment(_code);
 
 	function removeEmptyTextNodes(node) {
@@ -42,9 +44,13 @@ function transform(_code) {
 			props: {},
 		};
 
-		function walk(astNode, node) {
+		function walk(astNode, node, options = {}) {
 			if (node.nodeName === "#text") {
 				const dependencies = node.value.match(/state\.([a-zA-Z0-9]+)/g);
+
+				if (options.css) {
+					node.value = new CleanCSS().minify(node.value).styles;
+				}
 
 				astNode.children.push({
 					type: "Text",
@@ -57,15 +63,24 @@ function transform(_code) {
 					type: node.nodeName,
 					children: [],
 					props: {},
+					events: {},
 					id: nanoID(),
 				};
 
 				node.attrs.forEach((attr) => {
-					ast.props[attr.name] = attr.value;
+					const { name, value } = attr;
+
+					if (name.startsWith("on")) {
+						ast.events[name] = value;
+					} else {
+						ast.props[name] = value;
+					}
 				});
 
 				node.childNodes.forEach((child) => {
-					walk(ast, child);
+					walk(ast, child, {
+						css: node.nodeName === "style",
+					});
 				});
 
 				astNode.children.push(ast);
@@ -81,18 +96,32 @@ function transform(_code) {
 
 	let ast = genAST(node);
 
+	let _globals = [];
+	const addGlobal = (name) => {
+		if (_globals.find((g) => g === name)) return;
+		_globals.push(name);
+		return name;
+	};
+
+	let _uses = [];
+	let _updateFns = [];
+
 	function genCode(ast) {
-		function generate(astNode) {
+		function generate(
+			astNode,
+			options = {
+				isFor: false,
+			}
+		) {
 			let children = [];
 			let id = astNode.id || "root";
 
 			let codes = {
 				type: astNode.type,
 				id,
+				isFor: true,
 				create: f`
-                    const ${id} = create("${astNode.type}");
-
-                    setProps(${id}, ${JSON.stringify(astNode.props)});
+                	${id} = create("${astNode.type}");
                 `,
 				mount: f`
                     mount(${id}, ${id === "root" ? "render" : "root"});
@@ -102,6 +131,8 @@ function transform(_code) {
                 `,
 			};
 
+			addGlobal(id);
+
 			if (!astNode.children) return;
 
 			astNode.children.forEach((child) => {
@@ -109,17 +140,21 @@ function transform(_code) {
 
 				if (type === "Text") {
 					let textId = child.id;
+					const text = templateParser(child.value);
 
 					children.push({
 						type: "Text",
 						id: textId,
+						isFor: true,
 						value: child.value,
 						create: f`
-                            const ${textId} = createText(${JSON.stringify(
-							child.value
-						)});
+                        	${textId}_val = ()=>(${text});
 
-                        const ${textId}_dependencies = [${child.dependencies}]
+							${textId} = createText(${textId}_val());
+
+							${textId}_update = () => {
+								${textId}.textContent = ${textId}_val();
+							}
                         `,
 						mount: f`
                             mount(${textId}, ${id});
@@ -127,31 +162,155 @@ function transform(_code) {
 						unmount: f`
                             destroy(${textId});
                         `,
+						update: f`
+							${textId}_update();
+						`,
 					});
+
+					const uses = findUses(text);
+
+					uses.forEach((use) => {
+						_updateFns.push({
+							name: use,
+							fn: textId + "_update",
+						});
+					});
+
+					addGlobal(`${textId}_val`);
+					addGlobal(`${textId}`);
+					addGlobal(`${textId}_update`);
 				} else {
-					let children_ = generate(child).children;
+					let children_ = generate(child, {
+						isFor: true,
+					}).children;
 
 					let childId = child.id || "root";
+
+					let props = {};
+
+					let uses = [];
+
+					Object.keys(child.props).map((key) => {
+						const value = child.props[key];
+						let parsedValue = templateParser(value);
+
+						if (key === "for") {
+							parsedValue = value;
+						}
+
+						props[key] = parsedValue;
+
+						uses = [...uses, ...findUses(parsedValue)];
+					});
+
+					uses = [...new Set(uses.filter((u) => u.trim()))];
+
+					if (props.for) {
+						const for_ = props.for;
+						const in_ = props.in;
+
+						let block = {
+							type,
+							id: childId,
+							children: children_,
+							isFor: true,
+							create: f`
+								function block_${childId}_create(${for_}) {
+									
+								}
+
+
+							`,
+							mount: f`
+								block_${childId}_create();
+							`,
+							unmount: f`
+								
+							`,
+							update: f`
+								`,
+						};
+
+						children.push(block);
+
+						addGlobal(childId);
+						addGlobal(`${childId}_props`);
+						addGlobal(`${childId}_update_props`);
+
+						uses.forEach((use) => {
+							_updateFns.push({
+								name: use,
+								fn: childId + "_update_props",
+							});
+						});
+						
+						return;
+					}
 
 					children.push({
 						type,
 						id: childId,
 						children: children_,
+						isFor: true,
 						create: f`
-                            const ${childId} = create("${type}");
-                        `,
+								${childId} = create("${type}");
+	
+								${childId}_props = () => {
+									setProps(${childId},
+										{ 
+										${Object.keys(props).map((key) => {
+											return `${key}: ${props[key]}`;
+										})}
+										});
+									}
+	
+								${childId}_props();
+	
+								setEvents(
+									${childId},
+	
+									{
+										 ${Object.keys(child.events).map((key) => {
+												const fn = child.events[key];
+												const uses = findUses(fn);
+
+												_uses.push(findUses(fn));
+
+												return `${key}: ()=>{
+										(${child.events[key]})();
+	
+										${uses.map((u) => `__${u}__();`).join("\n")}
+							
+									 }`;
+											})}
+								});
+	
+								${childId}_update_props = ${childId}_props;
+							`,
 						mount: f`
-                            mount(${childId}, ${id});
-
-                            ${children_.map((child) => child.mount).join("\n")}
-                        `,
+								mount(${childId}, ${id});
+	
+								${children_.map((child) => child.mount).join("\n")}
+							`,
 						unmount: f`
-                            destroy(${childId});
+								destroy(${childId});
+	
+								${children_.map((child) => child.unmount).join("\n")}
+							`,
+						update: f`
+								${children_.map((child) => child.update).join("\n")}
+								`,
+					});
 
-                            ${children_
-															.map((child) => child.unmount)
-															.join("\n")}
-                        `,
+					addGlobal(childId);
+					addGlobal(`${childId}_props`);
+					addGlobal(`${childId}_update_props`);
+
+					uses.forEach((use) => {
+						_updateFns.push({
+							name: use,
+							fn: childId + "_update_props",
+						});
 					});
 				}
 			});
@@ -159,6 +318,7 @@ function transform(_code) {
 			return {
 				...codes,
 				children,
+				isFor: options.isFor,
 			};
 		}
 
@@ -177,7 +337,11 @@ function transform(_code) {
 	function generateCode(traversed) {
 		let out = "";
 
+		out += "let " + _globals.join(", ") + ";\n";
+
 		function walk(node) {
+			if (node.isFor) log(node.isFor);
+
 			out += `
                 ${node.create}
             `;
@@ -195,7 +359,37 @@ function transform(_code) {
 
 		walk(traversed);
 
-		out = f`${out}`;
+		const newUpdateFns = [];
+
+		_updateFns.forEach((fn) => {
+			const { name, fn: fnName } = fn;
+
+			const results = newUpdateFns.findIndex((f) => f.name === name);
+
+			if (results === -1) {
+				newUpdateFns.push({
+					name,
+					body: [fnName],
+				});
+			} else {
+				newUpdateFns[results].body.push(fnName);
+			}
+		});
+
+		out = f`
+			${out}
+
+			${newUpdateFns
+				.map((fn) => {
+					return f`
+					function __${fn.name}__() {
+						${fn.body.map((f) => `${f}();`).join("\n")}
+					}
+					`;
+				})
+				.join("\n")}
+			
+		`;
 
 		fs.writeFileSync(config.TEST_DIR + "/_component.js", out);
 

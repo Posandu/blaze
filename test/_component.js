@@ -1,76 +1,120 @@
-const root = create("App");
+let root,
+  _1,
+  _2_val,
+  _2,
+  _2_update,
+  _1_props,
+  _1_update_props,
+  _3,
+  _4,
+  _5_val,
+  _5,
+  _5_update,
+  _4_props,
+  _4_update_props,
+  _3_props,
+  _3_update_props,
+  _6,
+  _7_val,
+  _7,
+  _7_update,
+  _6_props,
+  _6_update_props;
 
-setProps(root, {});
+root = create("App");
 
-const _1 = create("h1");
+_1 = create("h1");
 
-const _2 = createText("Test if the component is working");
+_1_props = () => {
+  setProps(_1, {});
+};
 
-const _2_dependencies = [null];
+_1_props();
+
+setEvents(
+  _1,
+
+  {}
+);
+
+_1_update_props = _1_props;
+
+_2_val = () => `Test if the component is working`;
+
+_2 = createText(_2_val());
+
+_2_update = () => {
+  _2.textContent = _2_val();
+};
 
 mount(_1, root);
 
 mount(_2, _1);
 
-const _3 = create("button");
+function block__3_create($item) {}
 
-const _4 = createText("Click me to see if the component is working correctly");
+_4 = create("p");
 
-const _4_dependencies = [null];
+_4_props = () => {
+  setProps(_4, {});
+};
 
-mount(_3, root);
+_4_props();
+
+setEvents(
+  _4,
+
+  {}
+);
+
+_4_update_props = _4_props;
+
+_5_val = () => `ITEM ` + $item + ``;
+
+_5 = createText(_5_val());
+
+_5_update = () => {
+  _5.textContent = _5_val();
+};
 
 mount(_4, _3);
 
-const _5 = create("pre");
+mount(_5, _4);
 
-const _6 = createText('Clicked {{ "0"+20+1 }} times');
+block__3_create();
 
-const _6_dependencies = [null];
+_6 = create("style");
 
-mount(_5, root);
+_6_props = () => {
+  setProps(_6, {});
+};
 
-mount(_6, _5);
+_6_props();
 
-const _7 = create("div");
+setEvents(
+  _6,
 
-const _8 = create("p");
+  {}
+);
 
-const _9 = createText("{{ state.count }}");
+_6_update_props = _6_props;
 
-const _9_dependencies = [state.count];
+_7_val = () =>
+  `body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}`;
 
-mount(_8, _7);
+_7 = createText(_7_val());
 
-mount(_9, _8);
+_7_update = () => {
+  _7.textContent = _7_val();
+};
 
-const _a = create("b");
+mount(_6, root);
 
-const _b = create("p");
-
-const _c = createText("😃");
-
-const _c_dependencies = [null];
-
-mount(_b, _a);
-
-mount(_c, _b);
-
-mount(_a, _7);
-
-mount(_b, _a);
-
-mount(_c, _b);
-
-mount(_7, root);
-
-mount(_8, _7);
-
-mount(_9, _8);
-mount(_a, _7);
-
-mount(_b, _a);
-
-mount(_c, _b);
+mount(_7, _6);
 
 mount(root, render);
+
+function __$item__() {
+  _5_update();
+  _3_update_props();
+}

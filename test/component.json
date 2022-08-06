@@ -12,33 +12,8 @@
         }
       ],
       "props": {},
+      "events": {},
       "id": "_1"
-    },
-    {
-      "type": "button",
-      "children": [
-        {
-          "type": "Text",
-          "value": "Click me to see if the component is working correctly",
-          "id": "_4",
-          "dependencies": null
-        }
-      ],
-      "props": {},
-      "id": "_3"
-    },
-    {
-      "type": "pre",
-      "children": [
-        {
-          "type": "Text",
-          "value": "Clicked {{ \"0\"+20+1 }} times",
-          "id": "_6",
-          "dependencies": null
-        }
-      ],
-      "props": {},
-      "id": "_5"
     },
     {
       "type": "div",
@@ -48,41 +23,36 @@
           "children": [
             {
               "type": "Text",
-              "value": "{{ state.count }}",
-              "id": "_9",
-              "dependencies": [
-                "state.count"
-              ]
-            }
-          ],
-          "props": {
-            "class": "gray"
-          },
-          "id": "_8"
-        },
-        {
-          "type": "b",
-          "children": [
-            {
-              "type": "p",
-              "children": [
-                {
-                  "type": "Text",
-                  "value": "😃",
-                  "id": "_c",
-                  "dependencies": null
-                }
-              ],
-              "props": {},
-              "id": "_b"
+              "value": "ITEM {{ $item }}",
+              "id": "_5",
+              "dependencies": null
             }
           ],
           "props": {},
-          "id": "_a"
+          "events": {},
+          "id": "_4"
+        }
+      ],
+      "props": {
+        "for": "$item",
+        "in": "$list"
+      },
+      "events": {},
+      "id": "_3"
+    },
+    {
+      "type": "style",
+      "children": [
+        {
+          "type": "Text",
+          "value": "body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}",
+          "id": "_7",
+          "dependencies": null
         }
       ],
       "props": {},
-      "id": "_7"
+      "events": {},
+      "id": "_6"
     }
   ],
   "props": {}

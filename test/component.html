@@ -2,22 +2,27 @@
     Test if the component is working
 </h1>
 
-<button>
-    Click me to see if the component is working correctly
-</button>
 
-<pre>
-    Clicked {{ "0"+20+1 }} times
-</pre>
-
-<div>
-    <p class="gray">
-        {{ state.count }}
+<div for="$item" in="$list">
+    <p>
+        ITEM {{ $item }}
     </p>
-
-    <b>
-        <p>
-            😃
-        </p>
-    </b>
 </div>
+
+<style>
+    body {
+        background-color: #1a1a1a;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    }
+
+    .gray {
+        color: gray;
+    }
+
+    .underlined {
+        text-decoration: underline;
+    }
+
+    
+</style>
