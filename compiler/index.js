@@ -5,6 +5,7 @@ import { format } from "prettier";
 import { templateParser } from "./template.js";
 import { findDec, findUses } from "./declarations.js";
 import CleanCSS from "clean-css";
+import frameworkJS from "./frameworkJS.js";
 
 /***/
 const _code = fs.readFileSync(config.TEST_DIR + "/component.html", "utf8");
@@ -19,6 +20,7 @@ const nanoID = () => "_" + (++id).toString(36);
 
 function transform(_code) {
 	let node = parse5.parseFragment(_code);
+	let scripts = "";
 
 	/**
 	 * Remove Empty node
@@ -41,6 +43,26 @@ function transform(_code) {
 
 		node.childNodes.forEach(removeEmptyTextNodes);
 	}
+
+	/**
+	 * Remove Script nodes
+	 * @param {*} node 
+	 * @returns 
+	 */
+	function findScriptsAndRemove(node) {
+		if (!node.childNodes) return;
+
+		for (let i = 0; i < node.childNodes.length; i++) {
+			if (node.childNodes[i].nodeName === "script") {
+				scripts += node.childNodes[i].childNodes[0].value;
+				node.childNodes.splice(i, 1);
+				i--;
+			} else {
+				findScriptsAndRemove(node.childNodes[i]);
+			}
+		}
+	}
+
 
 	/**
 	 * Generate AST for component
@@ -103,6 +125,7 @@ function transform(_code) {
 	}
 
 	removeEmptyTextNodes(node);
+	findScriptsAndRemove(node);
 
 	let ast = genAST(node);
 
@@ -113,9 +136,6 @@ function transform(_code) {
 	function genCode(ast) {
 		function generate(
 			astNode,
-			options = {
-				isFor: false,
-			}
 		) {
 			let children = [];
 			let id = astNode.id || "root";
@@ -123,7 +143,6 @@ function transform(_code) {
 			let codes = {
 				type: astNode.type,
 				id,
-				isFor: true,
 				create: f`
                 	const ${id} = create("${astNode.type}");
                 `,
@@ -151,7 +170,6 @@ function transform(_code) {
 					children.push({
 						type: "Text",
 						id: textId,
-						isFor: true,
 						value: child.value,
 						create: f`
                         	const ${textId}_val = ()=>(${text});
@@ -186,9 +204,7 @@ function transform(_code) {
 						`,
 					});
 				} else {
-					const children_ = generate(child, {
-						isFor: true,
-					}).children;
+					const children_ = generate(child).children;
 
 					let childId = child.id || "root";
 
@@ -282,7 +298,6 @@ function transform(_code) {
 							type,
 							id: childId,
 							children: [],
-							isFor: true,
 							create: f`
 								const ${childId} = create("${type}");
 
@@ -320,7 +335,7 @@ function transform(_code) {
 								const ${childId}_items_update = () => {
 									
 								${childId}_items.forEach((item) => {
-									const created = block__3_create(item);
+									const created = block_${childId}_create(item);
 									const key = created.key;
 								
 									if (!${childId}_items_added.find((added) => added.key === key)) {
@@ -376,16 +391,12 @@ function transform(_code) {
 								let ${childId}_mounted = false;
 
 								const ${childId}_props = () => {
-									if (${childId}_mounted) {
-					
 									setProps(${childId},
 										{ 
 										${Object.keys(props).map((key) => {
 											return `${key}: ${props[key]}`;
 										})}
 										});
-
-									}
 								}
 	
 								${childId}_props();
@@ -410,6 +421,8 @@ function transform(_code) {
 								});
 	
 								const ${childId}_update_props = ${childId}_props;
+
+								${uses.map((u) => `__${u}__updates__.push(${childId}_update_props);`).join("\n")}
 							`,
 						mount: f`
 								mount(${childId}, ${id});
@@ -430,8 +443,7 @@ function transform(_code) {
 
 			return {
 				...codes,
-				children,
-				isFor: options.isFor,
+				children
 			};
 		}
 
@@ -450,6 +462,10 @@ function transform(_code) {
 	function generateCode(traversed) {
 		let out = `
 			"use strict";
+
+			${scripts}
+
+			${frameworkJS}
 		`
 
 		usesData.map((u) => {

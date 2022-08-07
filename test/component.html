@@ -2,6 +2,30 @@
     Test if the component is working
 </h1>
 
+<p>
+    {{ $count }}
+</p>
+
+<pre>
+    <b>
+        Hello World
+    </b>
+</pre>
+
+<h1
+    style="font-size: {{ $count }}px;"
+>
+    😀
+</h1>
+
+<script>
+    let $count = 0;
+    let $list = [
+        'Hello',
+        'World',
+        '!'
+    ];
+</script>
 
 <div for="$item" in="$list">
     <p>
@@ -23,6 +47,7 @@
 
     <button onclick="()=>{
         $list.splice($list.indexOf($item), 1);
+        $count;
     }">
         Remove {{ $item }}
     </button>

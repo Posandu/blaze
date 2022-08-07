@@ -1,7 +1,6 @@
 {
   "type": "App",
   "id": "root",
-  "isFor": false,
   "create": "const root = create(\"App\");",
   "mount": "mount(root, render);",
   "unmount": "destroy(root);",
@@ -13,7 +12,6 @@
         {
           "type": "Text",
           "id": "_2",
-          "isFor": true,
           "value": "Test if the component is working",
           "create": "const _2_val = () => `Test if the component is working`;\n\nlet _2_mounted = false;\n\nconst _2 = createText(_2_val());\n\nconst _2_update = () => {\n  if (_2_mounted) {\n    _2.textContent = _2_val();\n  }\n};",
           "mount": "mount(_2, _1);\n_2_mounted = true;",
@@ -22,40 +20,109 @@
         }
       ],
       "isFor": true,
-      "create": "const _1 = create(\"h1\");\n\nlet _1_mounted = false;\n\nconst _1_props = () => {\n  if (_1_mounted) {\n    setProps(_1, {});\n  }\n};\n\n_1_props();\n\nsetEvents(\n  _1,\n\n  {}\n);\n\nconst _1_update_props = _1_props;",
+      "create": "const _1 = create(\"h1\");\n\nlet _1_mounted = false;\n\nconst _1_props = () => {\n  setProps(_1, {});\n};\n\n_1_props();\n\nsetEvents(\n  _1,\n\n  {}\n);\n\nconst _1_update_props = _1_props;",
       "mount": "mount(_1, root);\n\nmount(_2, _1);\n_2_mounted = true;",
       "unmount": "destroy(_1);\n\ndestroy(_2);\n_2_mounted = false;",
       "update": ""
     },
     {
-      "type": "div",
+      "type": "p",
       "id": "_3",
-      "children": [],
-      "isFor": true,
-      "create": "const _3 = create(\"div\");\n\nfunction block__3_create($item) {\n  /** Create Children */\n  const _4 = create(\"p\");\n\n  let _4_mounted = false;\n\n  const _4_props = () => {\n    if (_4_mounted) {\n      setProps(_4, {});\n    }\n  };\n\n  _4_props();\n\n  setEvents(\n    _4,\n\n    {}\n  );\n\n  const _4_update_props = _4_props;\n  const _5_val = () => `ITEM ` + $item + ``;\n\n  let _5_mounted = false;\n\n  const _5 = createText(_5_val());\n\n  const _5_update = () => {\n    if (_5_mounted) {\n      _5.textContent = _5_val();\n    }\n  };\n\n  __$item__updates__.push(_5_update);\n  const _6 = create(\"button\");\n\n  let _6_mounted = false;\n\n  const _6_props = () => {\n    if (_6_mounted) {\n      setProps(_6, {});\n    }\n  };\n\n  _6_props();\n\n  setEvents(\n    _6,\n\n    {\n      onclick: () => {\n        (() => {\n          $count++;\n          $list.push(\"item \" + $list.length);\n        })();\n\n        __$count__updates__.emit();\n        __$list__updates__.emit();\n        __$list__updates__.emit();\n      },\n    }\n  );\n\n  const _6_update_props = _6_props;\n  const _7_val = () =>\n    `This is ` +\n    $item +\n    `\n\n        ` +\n    $count +\n    ``;\n\n  let _7_mounted = false;\n\n  const _7 = createText(_7_val());\n\n  const _7_update = () => {\n    if (_7_mounted) {\n      _7.textContent = _7_val();\n    }\n  };\n\n  __$item__updates__.push(_7_update);\n\n  __$count__updates__.push(_7_update);\n  const _8 = create(\"b\");\n\n  let _8_mounted = false;\n\n  const _8_props = () => {\n    if (_8_mounted) {\n      setProps(_8, {\n        style: `font-size:` + (10 + 20) + ``,\n      });\n    }\n  };\n\n  _8_props();\n\n  setEvents(\n    _8,\n\n    {}\n  );\n\n  const _8_update_props = _8_props;\n  const _9_val = () => `` + (\" \" + $item) + ``;\n\n  let _9_mounted = false;\n\n  const _9 = createText(_9_val());\n\n  const _9_update = () => {\n    if (_9_mounted) {\n      _9.textContent = _9_val();\n    }\n  };\n\n  __$item__updates__.push(_9_update);\n  const _a = create(\"button\");\n\n  let _a_mounted = false;\n\n  const _a_props = () => {\n    if (_a_mounted) {\n      setProps(_a, {});\n    }\n  };\n\n  _a_props();\n\n  setEvents(\n    _a,\n\n    {\n      onclick: () => {\n        (() => {\n          $list.splice($list.indexOf($item), 1);\n        })();\n\n        __$list__updates__.emit();\n        __$list__updates__.emit();\n        __$item__updates__.emit();\n      },\n    }\n  );\n\n  const _a_update_props = _a_props;\n  const _b_val = () => `Remove ` + $item + ``;\n\n  let _b_mounted = false;\n\n  const _b = createText(_b_val());\n\n  const _b_update = () => {\n    if (_b_mounted) {\n      _b.textContent = _b_val();\n    }\n  };\n\n  __$item__updates__.push(_b_update);\n\n  const mount__3 = () => {\n    mount(_4, _3);\n\n    mount(_5, _4);\n    _5_mounted = true;\n    mount(_6, _3);\n\n    mount(_7, _6);\n    _7_mounted = true;\n    mount(_8, _6);\n\n    mount(_9, _8);\n    _9_mounted = true;\n    mount(_a, _3);\n\n    mount(_b, _a);\n    _b_mounted = true;\n  };\n\n  const unmount__3 = () => {\n    destroy(_4);\n\n    destroy(_5);\n    _5_mounted = false;\n    destroy(_6);\n\n    destroy(_7);\n    _7_mounted = false;\n    destroy(_8);\n\n    destroy(_9);\n    _9_mounted = false;\n    destroy(_a);\n\n    destroy(_b);\n    _b_mounted = false;\n  };\n\n  const update__3 = () => {};\n\n  return {\n    mount: mount__3,\n    unmount: unmount__3,\n    update: update__3,\n    key: $item,\n  };\n}",
-      "mount": "mount(_3, root);\n\nconst _3_items = $list;\nconst _3_items_added = [];\nlet _3_item_index = 0;\n\nconst _3_items_update = () => {\n  _3_items.forEach((item) => {\n    const created = block__3_create(item);\n    const key = created.key;\n\n    if (!_3_items_added.find((added) => added.key === key)) {\n      _3_items_added.push({\n        key,\n        created,\n      });\n      created.mount();\n    }\n  });\n\n  _3_items_added.forEach((added) => {\n    if (!_3_items.find((item) => item === added.key)) {\n      added.created.unmount();\n      _3_items_added.splice(_3_items_added.indexOf(added), 1);\n    }\n  });\n};\n\n_3_items_update();\n\n__$item__updates__.push(_3_items_update);\n__$list__updates__.push(_3_items_update);",
-      "unmount": "unmount(_3);",
-      "update": ""
-    },
-    {
-      "type": "style",
-      "id": "_c",
       "children": [
         {
           "type": "Text",
-          "id": "_d",
-          "isFor": true,
-          "value": "body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}",
-          "create": "const _d_val = () =>\n  `body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}`;\n\nlet _d_mounted = false;\n\nconst _d = createText(_d_val());\n\nconst _d_update = () => {\n  if (_d_mounted) {\n    _d.textContent = _d_val();\n  }\n};",
-          "mount": "mount(_d, _c);\n_d_mounted = true;",
-          "unmount": "destroy(_d);\n_d_mounted = false;",
+          "id": "_4",
+          "value": "{{ $count }}",
+          "create": "const _4_val = () => `` + $count + ``;\n\nlet _4_mounted = false;\n\nconst _4 = createText(_4_val());\n\nconst _4_update = () => {\n  if (_4_mounted) {\n    _4.textContent = _4_val();\n  }\n};\n\n__$count__updates__.push(_4_update);",
+          "mount": "mount(_4, _3);\n_4_mounted = true;",
+          "unmount": "destroy(_4);\n_4_mounted = false;",
           "update": ""
         }
       ],
       "isFor": true,
-      "create": "const _c = create(\"style\");\n\nlet _c_mounted = false;\n\nconst _c_props = () => {\n  if (_c_mounted) {\n    setProps(_c, {});\n  }\n};\n\n_c_props();\n\nsetEvents(\n  _c,\n\n  {}\n);\n\nconst _c_update_props = _c_props;",
-      "mount": "mount(_c, root);\n\nmount(_d, _c);\n_d_mounted = true;",
-      "unmount": "destroy(_c);\n\ndestroy(_d);\n_d_mounted = false;",
+      "create": "const _3 = create(\"p\");\n\nlet _3_mounted = false;\n\nconst _3_props = () => {\n  setProps(_3, {});\n};\n\n_3_props();\n\nsetEvents(\n  _3,\n\n  {}\n);\n\nconst _3_update_props = _3_props;",
+      "mount": "mount(_3, root);\n\nmount(_4, _3);\n_4_mounted = true;",
+      "unmount": "destroy(_3);\n\ndestroy(_4);\n_4_mounted = false;",
+      "update": ""
+    },
+    {
+      "type": "pre",
+      "id": "_5",
+      "children": [
+        {
+          "type": "b",
+          "id": "_6",
+          "children": [
+            {
+              "type": "Text",
+              "id": "_7",
+              "value": "Hello World",
+              "create": "const _7_val = () => `Hello World`;\n\nlet _7_mounted = false;\n\nconst _7 = createText(_7_val());\n\nconst _7_update = () => {\n  if (_7_mounted) {\n    _7.textContent = _7_val();\n  }\n};",
+              "mount": "mount(_7, _6);\n_7_mounted = true;",
+              "unmount": "destroy(_7);\n_7_mounted = false;",
+              "update": ""
+            }
+          ],
+          "isFor": true,
+          "create": "const _6 = create(\"b\");\n\nlet _6_mounted = false;\n\nconst _6_props = () => {\n  setProps(_6, {});\n};\n\n_6_props();\n\nsetEvents(\n  _6,\n\n  {}\n);\n\nconst _6_update_props = _6_props;",
+          "mount": "mount(_6, _5);\n\nmount(_7, _6);\n_7_mounted = true;",
+          "unmount": "destroy(_6);\n\ndestroy(_7);\n_7_mounted = false;",
+          "update": ""
+        }
+      ],
+      "isFor": true,
+      "create": "const _5 = create(\"pre\");\n\nlet _5_mounted = false;\n\nconst _5_props = () => {\n  setProps(_5, {});\n};\n\n_5_props();\n\nsetEvents(\n  _5,\n\n  {}\n);\n\nconst _5_update_props = _5_props;",
+      "mount": "mount(_5, root);\n\nmount(_6, _5);\n\nmount(_7, _6);\n_7_mounted = true;",
+      "unmount": "destroy(_5);\n\ndestroy(_6);\n\ndestroy(_7);\n_7_mounted = false;",
+      "update": ""
+    },
+    {
+      "type": "h1",
+      "id": "_8",
+      "children": [
+        {
+          "type": "Text",
+          "id": "_9",
+          "value": "😀",
+          "create": "const _9_val = () => `😀`;\n\nlet _9_mounted = false;\n\nconst _9 = createText(_9_val());\n\nconst _9_update = () => {\n  if (_9_mounted) {\n    _9.textContent = _9_val();\n  }\n};",
+          "mount": "mount(_9, _8);\n_9_mounted = true;",
+          "unmount": "destroy(_9);\n_9_mounted = false;",
+          "update": ""
+        }
+      ],
+      "isFor": true,
+      "create": "const _8 = create(\"h1\");\n\nlet _8_mounted = false;\n\nconst _8_props = () => {\n  setProps(_8, {\n    style: `font-size: ` + $count + `px;`,\n  });\n};\n\n_8_props();\n\nsetEvents(\n  _8,\n\n  {}\n);\n\nconst _8_update_props = _8_props;\n\n__$count__updates__.push(_8_update_props);",
+      "mount": "mount(_8, root);\n\nmount(_9, _8);\n_9_mounted = true;",
+      "unmount": "destroy(_8);\n\ndestroy(_9);\n_9_mounted = false;",
+      "update": ""
+    },
+    {
+      "type": "div",
+      "id": "_a",
+      "children": [],
+      "create": "const _a = create(\"div\");\n\nfunction block__a_create($item) {\n  /** Create Children */\n  const _b = create(\"p\");\n\n  let _b_mounted = false;\n\n  const _b_props = () => {\n    setProps(_b, {});\n  };\n\n  _b_props();\n\n  setEvents(\n    _b,\n\n    {}\n  );\n\n  const _b_update_props = _b_props;\n  const _c_val = () => `ITEM ` + $item + ``;\n\n  let _c_mounted = false;\n\n  const _c = createText(_c_val());\n\n  const _c_update = () => {\n    if (_c_mounted) {\n      _c.textContent = _c_val();\n    }\n  };\n\n  __$item__updates__.push(_c_update);\n  const _d = create(\"button\");\n\n  let _d_mounted = false;\n\n  const _d_props = () => {\n    setProps(_d, {});\n  };\n\n  _d_props();\n\n  setEvents(\n    _d,\n\n    {\n      onclick: () => {\n        (() => {\n          $count++;\n          $list.push(\"item \" + $list.length);\n        })();\n\n        __$count__updates__.emit();\n        __$list__updates__.emit();\n        __$list__updates__.emit();\n      },\n    }\n  );\n\n  const _d_update_props = _d_props;\n  const _e_val = () =>\n    `This is ` +\n    $item +\n    `\n\n        ` +\n    $count +\n    ``;\n\n  let _e_mounted = false;\n\n  const _e = createText(_e_val());\n\n  const _e_update = () => {\n    if (_e_mounted) {\n      _e.textContent = _e_val();\n    }\n  };\n\n  __$item__updates__.push(_e_update);\n\n  __$count__updates__.push(_e_update);\n  const _f = create(\"b\");\n\n  let _f_mounted = false;\n\n  const _f_props = () => {\n    setProps(_f, {\n      style: `font-size:` + (10 + 20) + ``,\n    });\n  };\n\n  _f_props();\n\n  setEvents(\n    _f,\n\n    {}\n  );\n\n  const _f_update_props = _f_props;\n  const _g_val = () => `` + (\" \" + $item) + ``;\n\n  let _g_mounted = false;\n\n  const _g = createText(_g_val());\n\n  const _g_update = () => {\n    if (_g_mounted) {\n      _g.textContent = _g_val();\n    }\n  };\n\n  __$item__updates__.push(_g_update);\n  const _h = create(\"button\");\n\n  let _h_mounted = false;\n\n  const _h_props = () => {\n    setProps(_h, {});\n  };\n\n  _h_props();\n\n  setEvents(\n    _h,\n\n    {\n      onclick: () => {\n        (() => {\n          $list.splice($list.indexOf($item), 1);\n          $count;\n        })();\n\n        __$list__updates__.emit();\n        __$list__updates__.emit();\n        __$item__updates__.emit();\n        __$count__updates__.emit();\n      },\n    }\n  );\n\n  const _h_update_props = _h_props;\n  const _i_val = () => `Remove ` + $item + ``;\n\n  let _i_mounted = false;\n\n  const _i = createText(_i_val());\n\n  const _i_update = () => {\n    if (_i_mounted) {\n      _i.textContent = _i_val();\n    }\n  };\n\n  __$item__updates__.push(_i_update);\n\n  const mount__a = () => {\n    mount(_b, _a);\n\n    mount(_c, _b);\n    _c_mounted = true;\n    mount(_d, _a);\n\n    mount(_e, _d);\n    _e_mounted = true;\n    mount(_f, _d);\n\n    mount(_g, _f);\n    _g_mounted = true;\n    mount(_h, _a);\n\n    mount(_i, _h);\n    _i_mounted = true;\n  };\n\n  const unmount__a = () => {\n    destroy(_b);\n\n    destroy(_c);\n    _c_mounted = false;\n    destroy(_d);\n\n    destroy(_e);\n    _e_mounted = false;\n    destroy(_f);\n\n    destroy(_g);\n    _g_mounted = false;\n    destroy(_h);\n\n    destroy(_i);\n    _i_mounted = false;\n  };\n\n  const update__a = () => {};\n\n  return {\n    mount: mount__a,\n    unmount: unmount__a,\n    update: update__a,\n    key: $item,\n  };\n}",
+      "mount": "mount(_a, root);\n\nconst _a_items = $list;\nconst _a_items_added = [];\nlet _a_item_index = 0;\n\nconst _a_items_update = () => {\n  _a_items.forEach((item) => {\n    const created = block__a_create(item);\n    const key = created.key;\n\n    if (!_a_items_added.find((added) => added.key === key)) {\n      _a_items_added.push({\n        key,\n        created,\n      });\n      created.mount();\n    }\n  });\n\n  _a_items_added.forEach((added) => {\n    if (!_a_items.find((item) => item === added.key)) {\n      added.created.unmount();\n      _a_items_added.splice(_a_items_added.indexOf(added), 1);\n    }\n  });\n};\n\n_a_items_update();\n\n__$item__updates__.push(_a_items_update);\n__$list__updates__.push(_a_items_update);",
+      "unmount": "unmount(_a);",
+      "update": ""
+    },
+    {
+      "type": "style",
+      "id": "_j",
+      "children": [
+        {
+          "type": "Text",
+          "id": "_k",
+          "value": "body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}",
+          "create": "const _k_val = () =>\n  `body{background-color:#1a1a1a;color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.gray{color:gray}.underlined{text-decoration:underline}`;\n\nlet _k_mounted = false;\n\nconst _k = createText(_k_val());\n\nconst _k_update = () => {\n  if (_k_mounted) {\n    _k.textContent = _k_val();\n  }\n};",
+          "mount": "mount(_k, _j);\n_k_mounted = true;",
+          "unmount": "destroy(_k);\n_k_mounted = false;",
+          "update": ""
+        }
+      ],
+      "isFor": true,
+      "create": "const _j = create(\"style\");\n\nlet _j_mounted = false;\n\nconst _j_props = () => {\n  setProps(_j, {});\n};\n\n_j_props();\n\nsetEvents(\n  _j,\n\n  {}\n);\n\nconst _j_update_props = _j_props;",
+      "mount": "mount(_j, root);\n\nmount(_k, _j);\n_k_mounted = true;",
+      "unmount": "destroy(_j);\n\ndestroy(_k);\n_k_mounted = false;",
       "update": ""
     }
   ]
