@@ -7,6 +7,27 @@
     <p>
         ITEM {{ $item }}
     </p>
+
+    <button onclick="()=>{
+        $count++;
+        $list.push('item ' + $list.length);
+    }">
+       This is {{ $item }}
+
+        {{ $count }}
+
+        <b style="font-size:{{ 10 + 20 }}">
+            {{ " "+$item }}
+        </b>
+    </button>
+
+    <button onclick="()=>{
+        $list.splice($list.indexOf($item), 1);
+    }">
+        Remove {{ $item }}
+    </button>
+
+
 </div>
 
 <style>
@@ -23,6 +44,4 @@
     .underlined {
         text-decoration: underline;
     }
-
-    
 </style>

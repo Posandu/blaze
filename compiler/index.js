@@ -20,6 +20,11 @@ const nanoID = () => "_" + (++id).toString(36);
 function transform(_code) {
 	let node = parse5.parseFragment(_code);
 
+	/**
+	 * Remove Empty node
+	 * @param {*} node
+	 * @returns
+	 */
 	function removeEmptyTextNodes(node) {
 		if (!node.childNodes) return;
 
@@ -37,6 +42,11 @@ function transform(_code) {
 		node.childNodes.forEach(removeEmptyTextNodes);
 	}
 
+	/**
+	 * Generate AST for component
+	 * @param {*} node
+	 * @returns
+	 */
 	function genAST(node) {
 		let ast = {
 			type: "App",
@@ -96,15 +106,9 @@ function transform(_code) {
 
 	let ast = genAST(node);
 
-	let _globals = [];
-	const addGlobal = (name) => {
-		if (_globals.find((g) => g === name)) return;
-		_globals.push(name);
-		return name;
-	};
-
-	let _uses = [];
-	let _updateFns = [];
+	let usesData = [];
+	const addUses = (...args) =>
+		(usesData = [...new Set([...usesData, ...args])]);
 
 	function genCode(ast) {
 		function generate(
@@ -121,7 +125,7 @@ function transform(_code) {
 				id,
 				isFor: true,
 				create: f`
-                	${id} = create("${astNode.type}");
+                	const ${id} = create("${astNode.type}");
                 `,
 				mount: f`
                     mount(${id}, ${id === "root" ? "render" : "root"});
@@ -130,8 +134,6 @@ function transform(_code) {
                     destroy(${id});
                 `,
 			};
-
-			addGlobal(id);
 
 			if (!astNode.children) return;
 
@@ -142,45 +144,49 @@ function transform(_code) {
 					let textId = child.id;
 					const text = templateParser(child.value);
 
+					const uses = findUses(text);
+
+					addUses(...uses);
+
 					children.push({
 						type: "Text",
 						id: textId,
 						isFor: true,
 						value: child.value,
 						create: f`
-                        	${textId}_val = ()=>(${text});
+                        	const ${textId}_val = ()=>(${text});
 
-							${textId} = createText(${textId}_val());
+							let ${textId}_mounted = false;
 
-							${textId}_update = () => {
-								${textId}.textContent = ${textId}_val();
+							const ${textId} = createText(${textId}_val());
+
+							const ${textId}_update = () => {
+								if(${textId}_mounted) {
+									${textId}.textContent = ${textId}_val();
+								}
 							}
+
+							${uses
+								.map(
+									(u) => `
+								__${u}__updates__.push(${textId}_update);
+							`
+								)
+								.join("\n")}
                         `,
 						mount: f`
                             mount(${textId}, ${id});
+							${textId}_mounted = true;
                         `,
 						unmount: f`
                             destroy(${textId});
+							${textId}_mounted = false;
                         `,
 						update: f`
-							${textId}_update();
 						`,
 					});
-
-					const uses = findUses(text);
-
-					uses.forEach((use) => {
-						_updateFns.push({
-							name: use,
-							fn: textId + "_update",
-						});
-					});
-
-					addGlobal(`${textId}_val`);
-					addGlobal(`${textId}`);
-					addGlobal(`${textId}_update`);
 				} else {
-					let children_ = generate(child, {
+					const children_ = generate(child, {
 						isFor: true,
 					}).children;
 
@@ -194,7 +200,7 @@ function transform(_code) {
 						const value = child.props[key];
 						let parsedValue = templateParser(value);
 
-						if (key === "for") {
+						if (key === "for" || key === "in") {
 							parsedValue = value;
 						}
 
@@ -205,64 +211,182 @@ function transform(_code) {
 
 					uses = [...new Set(uses.filter((u) => u.trim()))];
 
+					addUses(...uses);
+
+					/**
+					 *
+					 * For
+					 *
+					 */
 					if (props.for) {
 						const for_ = props.for;
 						const in_ = props.in;
 
+						function getCreateCode(node) {
+							let out = "";
+
+							out += node.create;
+
+							if (node.children) {
+								node.children.forEach((child) => {
+									out += getCreateCode(child);
+								});
+							}
+
+							return out;
+						}
+
+						function getMountCode(node) {
+							let out = "";
+
+							out += node.mount;
+
+							if (node.children) {
+								node.children.forEach((child) => {
+									out += getMountCode(child);
+								});
+							}
+
+							return out;
+						}
+
+						function getUnmountCode(node) {
+							let out = "";
+
+							out += node.unmount;
+
+							if (node.children) {
+								node.children.forEach((child) => {
+									out += getUnmountCode(child);
+								});
+							}
+
+							return out;
+						}
+
+						function getUpdateCode(node) {
+							let out = "";
+
+							out += node.update;
+
+							if (node.children) {
+								node.children.forEach((child) => {
+									out += getUpdateCode(child);
+								});
+							}
+
+							return out;
+						}
+
 						let block = {
 							type,
 							id: childId,
-							children: children_,
+							children: [],
 							isFor: true,
 							create: f`
+								const ${childId} = create("${type}");
+
 								function block_${childId}_create(${for_}) {
+									/** Create Children */
+									${children_.map((child) => getCreateCode(child)).join("\n")}
+
+									const mount_${childId} = () => {
+										${children_.map((child) => child.mount).join("\n")}
+									}
 									
+									const unmount_${childId} = () => {
+										${children_.map((child) => child.unmount).join("\n")}
+									}
+
+									const update_${childId} = () => {
+										${children_.map((child) => child.update).join("\n")}
+									}
+
+									return {
+										mount: mount_${childId},
+										unmount: unmount_${childId},
+										update: update_${childId},
+										key: ${for_},
+									}
 								}
-
-
 							`,
 							mount: f`
-								block_${childId}_create();
+								mount(${childId}, ${id});
+
+								const ${childId}_items = (${in_});
+								const ${childId}_items_added = [];
+								let ${childId}_item_index = 0;
+
+								const ${childId}_items_update = () => {
+									
+								${childId}_items.forEach((item) => {
+									const created = block__3_create(item);
+									const key = created.key;
+								
+									if (!${childId}_items_added.find((added) => added.key === key)) {
+											${childId}_items_added.push({
+												key,
+												created,
+											});
+											created.mount();
+									}
+								});
+								
+								${childId}_items_added.forEach((added) => {
+										if (!${childId}_items.find((item) => item === added.key)) {
+											added.created.unmount();
+											${childId}_items_added.splice(${childId}_items_added.indexOf(added), 1);
+										}
+								});
+
+							   }
+
+							   	${childId}_items_update();
+
+								   ${uses.map((u) => `__${u}__updates__.push(${childId}_items_update);`).join("\n")}
+
+
 							`,
 							unmount: f`
-								
+								unmount(${childId});
 							`,
 							update: f`
-								`,
+								
+							`,
 						};
 
 						children.push(block);
 
-						addGlobal(childId);
-						addGlobal(`${childId}_props`);
-						addGlobal(`${childId}_update_props`);
-
-						uses.forEach((use) => {
-							_updateFns.push({
-								name: use,
-								fn: childId + "_update_props",
-							});
-						});
-						
-						return;
+						return block;
 					}
 
+					/**
+					 *
+					 * Normal
+					 *
+					 */
 					children.push({
 						type,
 						id: childId,
 						children: children_,
 						isFor: true,
 						create: f`
-								${childId} = create("${type}");
+								const ${childId} = create("${type}");
 	
-								${childId}_props = () => {
+								let ${childId}_mounted = false;
+
+								const ${childId}_props = () => {
+									if (${childId}_mounted) {
+					
 									setProps(${childId},
 										{ 
 										${Object.keys(props).map((key) => {
 											return `${key}: ${props[key]}`;
 										})}
 										});
+
 									}
+								}
 	
 								${childId}_props();
 	
@@ -274,18 +398,18 @@ function transform(_code) {
 												const fn = child.events[key];
 												const uses = findUses(fn);
 
-												_uses.push(findUses(fn));
+												addUses(...uses);
 
 												return `${key}: ()=>{
 										(${child.events[key]})();
 	
-										${uses.map((u) => `__${u}__();`).join("\n")}
+										${uses.map((u) => `__${u}__updates__.emit();`).join("\n")}
 							
 									 }`;
 											})}
 								});
 	
-								${childId}_update_props = ${childId}_props;
+								const ${childId}_update_props = ${childId}_props;
 							`,
 						mount: f`
 								mount(${childId}, ${id});
@@ -301,17 +425,6 @@ function transform(_code) {
 								${children_.map((child) => child.update).join("\n")}
 								`,
 					});
-
-					addGlobal(childId);
-					addGlobal(`${childId}_props`);
-					addGlobal(`${childId}_update_props`);
-
-					uses.forEach((use) => {
-						_updateFns.push({
-							name: use,
-							fn: childId + "_update_props",
-						});
-					});
 				}
 			});
 
@@ -325,7 +438,7 @@ function transform(_code) {
 		const generated = generate(ast);
 
 		fs.writeFileSync(
-			config.TEST_DIR + "/_component.json",
+			config.TEST_DIR + "/component.json",
 			JSON.stringify(generated, null, 2)
 		);
 
@@ -335,13 +448,26 @@ function transform(_code) {
 	let traversed = genCode(ast);
 
 	function generateCode(traversed) {
-		let out = "";
+		let out = `
+			"use strict";
+		`
 
-		out += "let " + _globals.join(", ") + ";\n";
+		usesData.map((u) => {
+			out += `
+			const __${u}__updates__ = ({
+				items: [],
+				push: (item) => {
+					__${u}__updates__.items.push(item);
+				},
+				emit: () => {
+					__${u}__updates__.items.forEach((item) => {
+						item();
+					});
+				},
+			})`
+		});
 
 		function walk(node) {
-			if (node.isFor) log(node.isFor);
-
 			out += `
                 ${node.create}
             `;
@@ -359,49 +485,14 @@ function transform(_code) {
 
 		walk(traversed);
 
-		const newUpdateFns = [];
-
-		_updateFns.forEach((fn) => {
-			const { name, fn: fnName } = fn;
-
-			const results = newUpdateFns.findIndex((f) => f.name === name);
-
-			if (results === -1) {
-				newUpdateFns.push({
-					name,
-					body: [fnName],
-				});
-			} else {
-				newUpdateFns[results].body.push(fnName);
-			}
-		});
-
 		out = f`
 			${out}
-
-			${newUpdateFns
-				.map((fn) => {
-					return f`
-					function __${fn.name}__() {
-						${fn.body.map((f) => `${f}();`).join("\n")}
-					}
-					`;
-				})
-				.join("\n")}
-			
 		`;
-
-		fs.writeFileSync(config.TEST_DIR + "/_component.js", out);
 
 		return out;
 	}
 
 	fs.writeFileSync(config.TEST_DIR + "/_component.js", generateCode(traversed));
-
-	fs.writeFileSync(
-		config.TEST_DIR + "/component.json",
-		JSON.stringify(ast, null, 2)
-	);
 }
 
 transform(_code);

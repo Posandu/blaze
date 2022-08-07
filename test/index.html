@@ -15,7 +15,7 @@
     window.render = document.getElementById('root');
 
     window.$count = 0
-    window.$list = ["test"]
+    window.$list = ["test", "test2", "test3"]
 
 
     /**
@@ -49,6 +49,10 @@
       for (const key in events) {
         element[key] = events[key]
       }
+    }
+
+    function destroy(element) {
+      element.remove();
     }
 
 
